@@ -12,7 +12,6 @@ using namespace std;
 
 int main()
 {
-
   // Message buffer
   struct buf {// the ordering matters in this struct.
   		long mtype; // required
@@ -42,6 +41,7 @@ int main()
         const string spid = to_string((long)getpid());
         strncat(msg.greeting, spid.c_str(), 50);// use strncat.
 
+        msg.mtype = 111;            // we are numbering our messages.
         pass = msgsnd(qid, (struct msgbuf *)&msg, size, 0);		// now we are sending the message.
         if(pass == 0){
           cout << "msg sent from A" << endl;
@@ -49,11 +49,10 @@ int main()
         pass = msgrcv (qid, (struct msgbuf *)&msg, size, 114, 0);
 
         cout << "got a message back " << msg.greeting << endl;
-        break;
       }
     }
     while(data > 100);
-
+    cout << data  << endl;
 
 
     return 0;

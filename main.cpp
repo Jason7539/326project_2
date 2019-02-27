@@ -54,56 +54,45 @@ int main()
 
     int pass = 0;       // variable to track whether a msgrcv is succesful
     // recieve messages from the probes
+    //
+    // while(flag_a){
+    //   pass = msgrcv(qid, (struct msgbuf *)&msg, size, 0, 0); // reading the message
+    //   cout << "recieved msg " << endl;
+    //
+    //   msgsnd(qid, (struct msgbuf *)&msg, size, 0);  // sending acknowledge mesg to A
+    //   cout << "sent: " <<  msg.greeting << endl;
+    // }
 
     while(flag_a || flag_b || flag_c)   // keeps check messages while the probes are on
     {
 
-      if(firstA == false){        // If we haven't got the first message from A
-                                  // capture it and get pid
 
-        pass = msgrcv (qid, (struct msgbuf *)&msg, size, Amtype, IPC_NOWAIT);
-        if(pass != -1) // if we successful read the first message from A
-        {
-          cout << "reading 1st msg" << endl;
-
-          Apid = msg.greeting;    // store the pid we get from A
-          cout << Apid << endl;
-          msg.mtype = 114;
-          strcat(msg.greeting, "acknowledge");
-          msgsnd(qid, (struct msgbuf *)&msg, size, 0);  // acknowledge mesg from A
-          firstA == true;         // no process message from A that aren't the pid
-        }
-      }
-
-      if(firstB == false){        // If we haven't got the first message from A
-                                  // capture it and get pid
-
-        pass = msgrcv (qid, (struct msgbuf *)&msg, size, 112, IPC_NOWAIT);
-        if(pass != -1) // if we successful read the first message from B
-        {
-          Bpid = msg.greeting;    // store the pid we get from B
-          firstB == true;         // begin processing message from B that aren't the pid
-        }
-      }
-
-      if(firstC == false){        // If we haven't got the first message from A
-                                  // capture it and get pid
-
-        pass = msgrcv (qid, (struct msgbuf *)&msg, size, 113, IPC_NOWAIT );
-        if(pass != -1) // if we successful read the first message from C
-        {
-          Cpid = msg.greeting;    // store the pid we get from C
-          firstC == true;         // no process message from C that aren't the pid
-        }
-      }
-
-      pass = msgrcv(qid, (struct msgbuf *)&msg, size, 0, IPC_NOWAIT); // reading the first message
-
-      if(pass == 0){    // process messsage if it msgcrcv succeeds
+      pass = msgrcv(qid, (struct msgbuf *)&msg, size, 0, 0); // reading the message
+      cout << "message recieved " << endl;
+      cout << "mtype: " << msg.mtype << endl;
+      if(pass != -1){    // process messsage if it msgcrcv succeeds
         switch(msg.mtype)
         {
           case 111: // prints probeA's pid and data
-            cout << "from" << Apid << ": " << msg.greeting << endl;
+            if(firstA == false){        // If we haven't got the first message from A
+                                        // capture it and get pid
+              cout << "FIRSTTTTTTTTTTTTTTTTTT " << endl;
+              Apid = msg.greeting;    // store the pid we get from A
+              cout << Apid << endl;
+
+              msg.mtype = 114;
+              strcat(msg.greeting, "acknowledge");
+              msgsnd(qid, (struct msgbuf *)&msg, size, 0);  // sending acknowledge mesg to A
+              cout << "sending message 114" << endl;
+              firstA = true;         // no process message from A that aren't the pid
+            }
+            else{ // Process all messages that aren't the first
+              cout << "from" << Apid << ": " << msg.greeting << endl;
+              msg.mtype = 114;
+              strcat(msg.greeting, "");
+              msgsnd(qid, (struct msgbuf *)&msg, size, 0);  // sending  acknowledge mesg to A
+              cout << "sending message 114" <<endl;
+            }
             break;
           case 112:
             break;
