@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstdlib>
+#include <time.h>
 
 
 using namespace std;
@@ -28,32 +29,50 @@ int main()
         return -1;
     }
 
-
-    msg.mtype = 111;            // we are numbering our messages.
-
     int pass;                   // Holds whether the msgsnd succeeds
     int data;                   // holds data that will be sent to datahub
+    srand (time(NULL));         // seed random number
+
+    bool firstmsg = false;      // Flag that displays if probeA has sent the first message
+
     do{
       data = rand();            // Generate the value
 
 
       if(data % alpha ==  0){   // Send message when a valid value is made
-        const string spid = to_string((long)getpid());
-        strncat(msg.greeting, spid.c_str(), 50);// use strncat.
+        if(firstmsg == false){
+          const string spid = to_string((long)getpid());
+          strncat(msg.greeting, spid.c_str(), 50);// use strncat.
 
-        msg.mtype = 111;            // we are numbering our messages.
-        pass = msgsnd(qid, (struct msgbuf *)&msg, size, 0);		// now we are sending the message.
-        if(pass == 0){
-          cout << "msg sent from A" << endl;
+          msg.mtype = 111;            // we are numbering our messages.
+          pass = msgsnd(qid, (struct msgbuf *)&msg, size, 0);		// now we are sending the message.
+          if(pass == 0){
+            cout << "msg sent from A" << endl;
+          }
+          pass = msgrcv (qid, (struct msgbuf *)&msg, size, 114, 0);
+
+          cout << "1st acknowledge" << msg.greeting << endl;
+
+          firstmsg = true;
         }
-        pass = msgrcv (qid, (struct msgbuf *)&msg, size, 114, 0);
+        else{
+          msg.mtype = 111;
+          strcpy(msg.greeting, to_string(data).c_str());
 
-        cout << "got a message back " << msg.greeting << endl;
+          pass = msgsnd(qid, (struct msgbuf *)&msg, size, 0);		// now we are sending the message.
+          if(pass == 0){
+            cout << "msg sent from A " << msg.mtype << " " << msg.greeting << endl;
+          }
+
+          pass = msgrcv (qid, (struct msgbuf *)&msg, size, 114, 0);
+
+          cout << "got a message back " << msg.mtype << endl;
+        }
       }
     }
     while(data > 100);
-    cout << data  << endl;
 
+    cout << "ENDING "  << data << endl;
 
     return 0;
 }
