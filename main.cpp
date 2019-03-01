@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 #include <cstdlib>
 #include <string>
+#include "force_patch.h"
 
 /*
  * This files executes the datahub which takes input from
@@ -53,42 +54,51 @@ int main()
 
     int pass = 0;       // variable to track whether a msgrcv is succesful
 
-    int Bcounter = 0;                   // holds how many mesgs from B. terminate B after 10,000 messages
+    int Bcounter = 0;                   // holds numbers of msg received. terminate B after 10,000 messages
 
     while(flag_a || flag_b || flag_c)   // keeps check messages while the probes are on
     {
-      pass = msgrcv(qid, (struct msgbuf *)&msg, size, 0, 0); // reading the message
+      pass = msgrcv(qid, (struct msgbuf *)&msg, size, -113, 0); // reading the message
 
       cout << "mtype: " << msg.mtype << "and the pass is " << pass << endl;
       if(pass != -1){    // process messsage if it msgcrcv succeeds
+
+        Bcounter++;                 // increase probeB message B counter
+
         switch(msg.mtype)
         {
           case 111: // prints probeA's pid and data
-            if(firstA == false){        // If we haven't got the first message from A
-                                        // capture it and get pid
+            if(firstA == false){        // If we haven't got the first message from A                                        // capture it and get pid
               Apid = msg.greeting;    // store the pid we get from A
+              cout << "trying to send " << endl;
 
               msg.mtype = 114;
               strcpy(msg.greeting, "sending");
-              msgsnd(qid, (struct msgbuf *)&msg, size, 0);  // sending acknowledge mesg to A
+              if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1) {  // sending acknowledge mesg to A
+                perror("msgsnd");
+              }
+
               cout << "sending message 114" << endl;
               firstA = true;         // no process message from A that aren't the pid
             }
             else{ // Process all messages that aren't the first
               cout << "from A " << Apid << ": " << msg.greeting << endl;
+
               msg.mtype = 114;
-              // strcat(msg.greeting, "");
-              msgsnd(qid, (struct msgbuf *)&msg, size, 0);  // sending  acknowledge mesg to A
-              counter++;
+              strcpy(msg.greeting, "acknowledge");
+              if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){  // sending  acknowledge mesg to A
+                perror("sending");
+              }
+              cout << "sent acknowledge " << endl;
             }
             break;
           case 112:
-            Bcounter++;                 // increase probeB message B counter
-            cout << "The Bcounter is :" << Bcounter << endl;
             if(Bcounter == 10000){      // terminate b when we recieve the 10000 msg
               // terminate B
               cout << "REACHED THE END OF B ********************************************************************" << endl;
-              cin >> msg.greeting;
+              cout << Bpid << "the b id is " << endl;
+              int id = stoi(Bpid.substr(2, -1));
+              force_patch(id);
               break;
             }
 
@@ -106,6 +116,7 @@ int main()
           default:
             // datahub read a message that it wasn't suppose to( sent from itself)
             cout << "got a wierd one " << endl;
+            cin >> msg.greeting;
             pass = msgsnd(qid, (struct msgbuf *)&msg, size, 0);  // place the read message back
             break;
         }
