@@ -41,13 +41,13 @@ int main()
     if(data % alpha ==  0){   // Send message when a valid value is made
       if(firstmsg == false){
         const string spid = to_string((int)getpid());   // get the pid
-        strcpy(msg.greeting, spid.c_str());  // sending pid to hub
+        strncpy(msg.greeting, spid.c_str(), size);  // sending pid to hub
 
         msg.mtype = 111;            // we are numbering our messages.
         if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){		// now we are sending the message.
           perror("msgsnd");
         }
-        cout << "sent:" << msg.greeting << endl;
+        cout << getpid() << "sent:" << msg.greeting << endl;
 
         if(msgrcv (qid, (struct msgbuf *)&msg, size, 114, 0) == -1){  // recieve acknowledgement from hub
           perror("msgrcv");
@@ -58,12 +58,12 @@ int main()
       }
       else{
         msg.mtype = 111;
-        strcpy(msg.greeting, to_string(data).c_str());
+        strncpy(msg.greeting, to_string(data).c_str(), size);
         if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){		// now we are sending the message.
           perror("msgsnd2");
         }
 
-        cout << "sending: " << msg.greeting << endl;
+        cout << getpid() << " " << "sending: " << msg.greeting << endl;
 
         if(msgrcv (qid, (struct msgbuf *)&msg, size, 114, 0) == -1){ // recieve acknowledgement
           perror("msgrcv2:");

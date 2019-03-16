@@ -24,7 +24,7 @@ int main()
 	};
 
     int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);   // Create the fresh message queue
-    if(qid == -1){                             // Exit out of program if the message queue is not succesful
+    if(qid == -1){                             // Exit out of program if the message queue is not successful
         cout << strerror(errno) << endl;
         return -1;
     }
@@ -52,7 +52,7 @@ int main()
     buf msg;        // declare container for the message
     int size = sizeof(msg)-sizeof(long);         // calculate the size of the message.
 
-    int pass = 0;       // variable to track whether a msgrcv is succesful
+    int pass = 0;       // variable to track whether a msgrcv is successful
 
     int Bcounter = 0;                   // holds numbers of msg received. terminate B after 10,000 messages
 
@@ -63,8 +63,6 @@ int main()
       cout << "mtype: " << msg.mtype << "and the pass is " << pass << endl;
       if(pass != -1){    // process messsage if it msgcrcv succeeds
 
-        Bcounter++;                 // increase probeB message B counter
-
         switch(msg.mtype)
         {
           case 111: // prints probeA's pid and data
@@ -73,7 +71,7 @@ int main()
               cout << "trying to send " << endl;
 
               msg.mtype = 114;
-              strcpy(msg.greeting, "sending");
+              strncpy(msg.greeting, "sending", size);
               if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1) {  // sending acknowledge mesg to A
                 perror("msgsnd");
               }
@@ -85,7 +83,7 @@ int main()
               cout << "from A " << Apid << ": " << msg.greeting << endl;
 
               msg.mtype = 114;
-              strcpy(msg.greeting, "acknowledge");
+              strncpy(msg.greeting, "acknowledge", size);
               if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){  // sending  acknowledge mesg to A
                 perror("sending");
               }
@@ -93,6 +91,8 @@ int main()
             }
             break;
           case 112:
+            Bcounter++;                 // increase probeB message B counter
+
             if(Bcounter == 10000){      // terminate b when we recieve the 10000 msg
               // terminate B
               cout << "REACHED THE END OF B ********************************************************************" << endl;
@@ -106,12 +106,28 @@ int main()
               Bpid = msg.greeting;      // save the pid
               firstB = true;
             }
-            else{ // prints b message
+            else { // prints b message
               cout << "from B " << Bpid << ": " << msg.greeting << endl;
 
             }
             break;
           case 113:
+            if(firstC == false){        // process the pid of B if it's the 1st msg
+              // char delimiter = ' ';
+              // char token = msg.greeting.substr(0, msg.greeting.find(delimiter));
+              Cpid = msg.greeting;      // save the pid
+              firstC = true;
+            }
+            else { // prints b message
+              // if(strcmp(msg.greeting, "?")) {
+              //   break;
+              // }
+              string s = "scott>=tiger";
+              string delimiter = " ";
+              string token = s.substr(0, s.find(delimiter));
+              cout << "C PID" << Cpid << ": " << msg.greeting << endl;
+
+            }
             break;
           default:
             // datahub read a message that it wasn't suppose to( sent from itself)
@@ -128,5 +144,5 @@ int main()
     }
     msgctl (qid, IPC_RMID, NULL);                           // deallocate the queue.
     cout << "pogram ended " << endl;
-    return 0;
+    exit(0);
 }
