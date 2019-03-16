@@ -112,20 +112,22 @@ int main()
             }
             break;
           case 113:
-            if(firstC == false){        // process the pid of B if it's the 1st msg
-              // char delimiter = ' ';
-              // char token = msg.greeting.substr(0, msg.greeting.find(delimiter));
-              Cpid = msg.greeting;      // save the pid
+            char PID [10];
+            char message [10];
+            strcpy(PID, strtok(msg.greeting , " "));
+            strcpy(message, strtok(NULL, "\0"));
+            
+            if(firstC == false){        // process the pid of C if it's the 1st msg
+              
+              //string token = msg.greeting[0, msg.greeting.find(delimiter)];
+              Cpid = PID;      // save the pid
               firstC = true;
             }
             else { // prints b message
               // if(strcmp(msg.greeting, "?")) {
               //   break;
               // }
-              string s = "scott>=tiger";
-              string delimiter = " ";
-              string token = s.substr(0, s.find(delimiter));
-              cout << "C PID" << Cpid << ": " << msg.greeting << endl;
+              cout << "C PID " << Cpid << ": " << message << endl;
 
             }
             break;
