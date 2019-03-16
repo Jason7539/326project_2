@@ -114,20 +114,21 @@ int main()
           case 113:
             char PID [10];
             char message [10];
+            // Gets the PID from msg.greeting
             strcpy(PID, strtok(msg.greeting , " "));
+            // Gets the message (C's reading which is a random int) from msg.greeting
             strcpy(message, strtok(NULL, "\0"));
             
             if(firstC == false){        // process the pid of C if it's the 1st msg
-              
-              //string token = msg.greeting[0, msg.greeting.find(delimiter)];
               Cpid = PID;      // save the pid
               firstC = true;
             }
-            else { // prints b message
+            else { 
+              // prints b message
               // if(strcmp(msg.greeting, "?")) {
               //   break;
               // }
-              cout << "C PID " << Cpid << ": " << message << endl;
+              cout << "C's PID is: " << Cpid << " Reading received: " << message << endl;
 
             }
             break;
