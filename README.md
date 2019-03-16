@@ -1,42 +1,28 @@
 # 326project_2
 
 To compile deleting the queue (You may need to delete the queue before running the DataHub.):
-
-g++ -o delete deletequeue.cpp 
-
+- g++ -o delete deletequeue.cpp 
 To run:
-
-./delete
+- ./delete
 
 To compile the DataHub (This must be ran before probes A, B, and C):
-
-g++ -o hub main.cpp force_patch64.o
+- g++ -o hub main.cpp force_patch64.o
 To run:
-
-./hub
+- ./hub
 
 Probes A, B, and Cshould be able to run in any order and concurrently after the DataHub.
 
 To compile probeA:
-
-g++ -o a probeA.cpp
-
+- g++ -o a probeA.cpp
 To run:
-
-./a
+- ./a
 
 To compile probeB:
-
-g++ -o b probeB.cpp
-
+- g++ -o b probeB.cpp
 To run:
-
-./b
+- ./b
 
 To compile probeC:
-
-g++ -o c probeC.cpp kill_patch64.o
-
+- g++ -o c probeC.cpp kill_patch64.o
 To run:
-
-./c
+- ./c
