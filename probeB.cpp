@@ -13,17 +13,17 @@ using namespace std;
 int main()
 {
   // Message buffer
-  struct buf {// the ordering matters in this struct.
+  struct buf {
   		long mtype; // required
   		char greeting[50]; // mesg content
 	};
 
-	buf msg;  		// this is the container of the message.
+	buf msg;  		// container of the message.
   int size = sizeof(msg)-sizeof(long);         // calculate the size of the message.
-  const int beta = 257;                        // seed value to determine valid data
+  const int beta = 514;                        // seed value to determine valid data
 
 	int qid = msgget(ftok(".",'u'), 0);          // get locate the queue
-    if(qid == -1){                             // Exit out of program if the message queue is not succesful
+    if(qid == -1){                             // Exit out of program if message queue is not created
         cout << strerror(errno) << endl;
         return -1;
     }
@@ -36,29 +36,33 @@ int main()
 
     bool firstmsg = false;      // Flag that displays if probeA has sent the first message
 
+    char stringData[50];
     while(true){
-      data = rand();
 
-      if(data % beta == 0){
+      data = rand();            // generate data to send to hub
+
+      if(data % beta == 0){     // send message when valid data is created
         if(firstmsg == false){
-          const string spid = to_string((int)getpid());
-          strncat(msg.greeting, spid.c_str(), 50);// use strncat.
+          sprintf(stringData, "%d", (int) getpid());           // send B pid as first message
+          strcpy(msg.greeting, stringData);
 
-          msg.mtype = 112;            // we are numbering our messages.
+          msg.mtype = 112;
           pass = msgsnd(qid, (struct msgbuf *)&msg, size, 0);		// sending the pid as 1st msg
           if(pass == 0){
-            cout << "msg sent from B" << endl;
+            cout << "sent B's pid" << endl;
           }
 
           firstmsg = true;
         }
         else{
           msg.mtype = 112;
-          strcpy(msg.greeting, to_string(data).c_str());
 
-          pass = msgsnd(qid, (struct msgbuf *)&msg, size, 0);		// now we are sending the message.
+          sprintf(stringData, "%d", data);
+          strcpy(msg.greeting, stringData);       // send the data generated to hub
+
+          pass = msgsnd(qid, (struct msgbuf *)&msg, size, 0);		//sending the message.
           if(pass == 0){
-            cout << "msg sent from B " << msg.mtype << " " << msg.greeting << endl;
+            cout <<"B :" <<getpid() << ": sends reading :" << data << endl;
           }
         }
       }

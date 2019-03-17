@@ -7,21 +7,21 @@
 #include <sys/wait.h>
 #include <cstdlib>
 #include <time.h>
-
+#include <errno.h>
 
 using namespace std;
 
 int main()
 {
   // Message buffer
-  struct buf {// the ordering matters in this struct.
+  struct buf {
     long mtype; // required
     char greeting[50]; // mesg content
   };
 
-  buf msg;  		// this is the container of the message.
+  buf msg;  		// container of the message.
   int size = sizeof(msg)-sizeof(long);         // calculate the size of the message.
-  const int alpha = 997;                       // seed value to determine valid data
+  const int alpha = 1994;                       // seed value to determine valid data
 
   int qid = msgget(ftok(".",'u'), 0);          // get locate the queue
   if(qid == -1){                             // Exit out of program if the message queue is not succesful
@@ -34,46 +34,57 @@ int main()
 
   bool firstmsg = false;      // Flag that displays if probeA has sent the first message
 
+  char stringData[50];
+
   do{
     data = rand();            // Generate the value
 
 
     if(data % alpha ==  0){   // Send message when a valid value is made
       if(firstmsg == false){
-        const string spid = to_string((int)getpid());   // get the pid
-        strcpy(msg.greeting, spid.c_str());  // sending pid to hub
 
-        msg.mtype = 111;            // we are numbering our messages.
-        if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){		// now we are sending the message.
+        sprintf(stringData, "%d", (int) getpid());
+        strcpy(msg.greeting, stringData);     // send the A's pid to hub if it is the first msg
+
+        msg.mtype = 111;
+        if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){
           perror("msgsnd");
         }
         cout << "sent:" << msg.greeting << endl;
-
-        if(msgrcv (qid, (struct msgbuf *)&msg, size, 114, 0) == -1){  // recieve acknowledgement from hub
-          perror("msgrcv");
-        }
-        cout << "1st acknowledge receive:" << msg.greeting << endl;
-
         firstmsg = true;
+
       }
       else{
         msg.mtype = 111;
-        strcpy(msg.greeting, to_string(data).c_str());
-        if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){		// now we are sending the message.
-          perror("msgsnd2");
-        }
+        sprintf(stringData, "%d", data);        // send the random generated data
 
-        cout << "sending: " << msg.greeting << endl;
-
-        if(msgrcv (qid, (struct msgbuf *)&msg, size, 114, 0) == -1){ // recieve acknowledgement
-          perror("msgrcv2:");
+        strcpy(msg.greeting, stringData);
+        if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){		// sending the message.
+          perror("msgsnd");
         }
-        cout << "recieved: " << msg.greeting << endl;
       }
+      cout <<"A :" << getpid() << ": sends reading :" << data << endl;
+
+
+      // wait for acknowledgement after sending message
+      if(msgrcv (qid, (struct msgbuf *)&msg, size, 114, 0) == -1){ // recieve acknowledgement
+        perror("msgrcv:");
+        cout << errno << endl;
+        cout << strerror(errno) << endl;
+        cin >> data;
+      }
+      cout << "recieved: acknowledge " << endl;
+
     }
   }
   while(data > 100);
 
+  // send goodbye message to hub
+  msg.mtype = 110;
+  strcpy(msg.greeting, to_string(data).c_str());
+  if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){		// sending the message.
+    perror("msgsnd");
+  }
   cout << "ENDING "  << data << endl;
 
   return 0;
