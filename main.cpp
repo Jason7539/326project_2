@@ -2,7 +2,7 @@
 
 Assignment files: main.cpp (DataHub), probeA.cpp, probeB.cpp, force_patch.h, force_patch64.o, kill_patch.h, kill_patch64.o
 
-Description: This file servers a a hub to recieve and print out messages
+Description: This file servers a hub to recieve and print out messages
 produced by probeA.cpp, probeB.cpp, and probeC.cpp. The hub will also send
 an acknowledge message for messages received from probeA. Main.cpp is also
 responsible for terminating probeB after 10,000 messages have been recieved.
