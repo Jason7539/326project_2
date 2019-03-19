@@ -108,7 +108,7 @@ int main()
 
             // sending acknowledge to A
             msg.mtype = 114;
-            strncpy(msg.greeting, "acknowledge", 20);
+            strncpy(msg.greeting, "acknowledge", size);
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);  // sending  acknowledge mesg to A
 
             cout << "sent acknowledge " << endl;

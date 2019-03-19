@@ -54,7 +54,7 @@ int main()
     if(data % alpha ==  0){   // Send message when a valid value is made
       if(firstmsg == false){  // send Pid on first message
         sprintf(stringData, "%d", (int) getpid()); // convert pid to string
-        strncpy(msg.greeting, stringData, 20);
+        strncpy(msg.greeting, stringData, size);
 
         msg.mtype = 111;
         if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){ // sending the pid
@@ -68,7 +68,7 @@ int main()
         msg.mtype = 111;
         sprintf(stringData, "%d", data);        // convert integer to string
 
-        strncpy(msg.greeting, stringData, 20);
+        strncpy(msg.greeting, stringData, size);
         if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){ // sending the message.
           perror("msgsnd");
         }
@@ -89,7 +89,7 @@ int main()
 
   // send goodbye message to hub
   msg.mtype = 110;
-  strncpy(msg.greeting, to_string(data).c_str(), 20);
+  strncpy(msg.greeting, to_string(data).c_str(), size);
   if(msgsnd(qid, (struct msgbuf *)&msg, size, 0) == -1){		// sending the message.
     perror("msgsnd");
   }
