@@ -1,9 +1,15 @@
-// Jason Nguyen
-// Chelsea Marfil
-// Sophanna Ek
-// ProbeA.cpp main.cpp
-// This file sends data to the hub.  For each data that is send probeA expects
-// an acknowledge message back.
+/* Names: Jason Nguyen, Sophanna Ek, Chelsea Marfil
+
+Assignment files: main.cpp (DataHub), probeA.cpp, probeB.cpp, force_patch.h, force_patch64.o, kill_patch.h, kill_patch64.o
+
+Description: This file is ProbeA which executes concurrently with the DataHub, ProbeC, and ProbeB.
+ProbeA will use a message queue created by the DataHub (main.cpp). ProbeA expects
+an acknowledge message for every message it sends to the datahub.
+
+Pre-conditions: Datahub is running in separate terminal
+Post-conditions: ProbeA sends messages to the queue and DataHub outputs them if valid.
+*/
+
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>

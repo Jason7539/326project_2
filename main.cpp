@@ -1,11 +1,18 @@
-// Jason Nguyen
-// Chelsea Marfil
-// Sophanna Ek
-// Main.cpp
-// This file servers a a hub to recieve and print out messages
-// produced by probeA.cpp, probeB.cpp, and probeC.cpp. Main.cpp is also
-// responsible for terminating probeB after 10,000 messages have been recieved.
-// The message queue is also created and deleted in main.cpp
+/* Names: Jason Nguyen, Sophanna Ek, Chelsea Marfil
+
+Assignment files: main.cpp (DataHub), probeA.cpp, probeB.cpp, force_patch.h, force_patch64.o, kill_patch.h, kill_patch64.o
+
+Description: This file servers a hub to recieve and print out messages
+produced by probeA.cpp, probeB.cpp, and probeC.cpp. The hub will also send
+an acknowledge message for messages received from probeA. Main.cpp is also
+responsible for terminating probeB after 10,000 messages have been recieved.
+The message queue is also created and deleted in main.cpp
+
+Pre-conditions: compile main.cpp "g++ main.cpp force_patch64.o"
+run main.cpp with proper permission needed to change the size of the message queue.
+Post-conditions: Message queue is created
+*/
+
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
