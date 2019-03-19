@@ -37,7 +37,7 @@ int main()
 		char greeting[50]; // Message
 	};
 	buf msg; // Will hold the mtype and message.
-	int size = sizeof(msg)-sizeof(long); // Length of the message
+	int size = sizeof(msg)-sizeof(long); // Size of the message
 
   /* Makes the message queue available. Locates the queue created by DataHub (main.cpp).
   The ftok function generates a system-wide key associated with the queue. 

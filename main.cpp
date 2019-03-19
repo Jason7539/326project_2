@@ -121,9 +121,9 @@ int main()
             char PID [10];
             char message [10];
             // Gets the PID from msg.greeting which is separated from the reading by delimiter " "
-            strcpy(PID, strtok(msg.greeting , " "));
+            strncpy(PID, strtok(msg.greeting , " "), size);
             // Gets the reading (C's reading which is a random int) from msg.greeting which comes after the delimeter " "
-            strcpy(message, strtok(NULL, "\0"));
+            strncpy(message, strtok(NULL, "\0"), size);
 
             if(firstC == false){        // process the pid of C if it's the 1st msg
               Cpid = PID;               // save the pid
