@@ -10,8 +10,6 @@ Pre-conditions: Datahub is running in separate terminal
 Post-conditions: ProbeA sends messages to the queue and DataHub outputs them if valid.
 */
 
-
-
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
